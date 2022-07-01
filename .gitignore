@@ -4,3 +4,4 @@ questions.md
 db.sqlite3
 *.pdf
 README.md
+data/
