@@ -14,8 +14,39 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include, re_path
+from drf_yasg.views import get_schema_view
+from rest_framework_simplejwt import views as jwt_views
+from routers import router
+from dealers.views import index
+from django.conf.urls.static import static
+from django.conf import settings
+from rest_framework import permissions
+from drf_yasg import openapi
+
+schema_view = get_schema_view(
+    openapi.Info(
+        title="Dealership network API",
+        default_version='v1',
+        description="Documentation for the website",
+    ),
+    public=True,
+    permission_classes=(permissions.AllowAny,),
+)
+
 
 urlpatterns = [
+    path('', index),
     path('admin/', admin.site.urls),
-]
+    path('api/', include(router.urls)),  # with urls or not
+    path('api-auth/', include('rest_framework.urls')),
+    path('api/token/', jwt_views.TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),
+    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+
+if settings.DEBUG:
+    urlpatterns = [
+        path('__debug__/', include('debug_toolbar.urls')),
+    ] + urlpatterns
