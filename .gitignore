@@ -1,7 +1,5 @@
 __pycache__/
 .idea/
-questions.md
 db.sqlite3
 *.pdf
-README.md
 data/

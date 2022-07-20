@@ -20,6 +20,7 @@ class PromotionsAndDiscounts(models.Model):
 
 
 def get_chars():
+    """ Filter of car's preferences for Buyer and Dealer """
     characteristics_car = {
         'car_brand': [],
         'car_model': [],
