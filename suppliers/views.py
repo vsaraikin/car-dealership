@@ -1,3 +1,5 @@
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.viewsets import ModelViewSet
 from .models import Supplier, Suppliers, SupplierPromotion
 from .serializers import SuppliersSerializer, SupplierPromotionSerializer, SupplierSerializer
@@ -8,6 +10,10 @@ class SuppliersViewSet(ModelViewSet):
     queryset = Suppliers.objects.all()
     serializer_class = SuppliersSerializer
     permission_classes = (permissions.AllowAny,)
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filterset_fields = '__all__'
+    search_fields = '__all__'
+    ordering_fields = '__all__'
 
 
 class SupplierViewSet(ModelViewSet):
