@@ -8,7 +8,7 @@ class Suppliers(InstanceStatus):
     name = models.CharField(verbose_name="Supplier's name", max_length=20)
     founded_year = models.DateTimeField(verbose_name="Foundation year")
     buyers_amount = models.PositiveIntegerField(verbose_name="Buyers amount")
-    car_list = models.PositiveIntegerField(verbose_name="Car for sale")
+    car_count = models.PositiveIntegerField(verbose_name="Number of cars for sale", default=0)
 
     class Meta:
         verbose_name_plural = "Suppliers"
