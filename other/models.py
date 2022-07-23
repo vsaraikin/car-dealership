@@ -18,10 +18,6 @@ class PromotionsAndDiscounts(models.Model):
     class Meta:
         abstract = True
 
-OFFER_STATUS = (
-    ('close', 'Closed success!'),
-    ('open', 'Still ')
-)
 
 def get_chars():
     """ Filter of car's preferences for Buyer and Dealer """
