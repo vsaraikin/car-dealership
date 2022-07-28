@@ -38,6 +38,9 @@ class DealerToBuyer(InstanceStatus):
     dealer = models.ForeignKey('dealers.Dealers', on_delete=models.SET_NULL, null=True)
     buyer = models.ForeignKey('buyers.Buyers', on_delete=models.SET_NULL, null=True)
     price = MoneyField(decimal_places=2, default_currency='USD', max_digits=10)
+    car_count = models.PositiveIntegerField(default=1)
+    total_sum = MoneyField(max_digits=10, decimal_places=2, default_currency='USD', verbose_name='Total sum',
+                           default=0)
 
     def __str__(self):
         return f'{self.car} : from {self.dealer} to {self.buyer}'
@@ -53,6 +56,7 @@ class SupplierToDealer(InstanceStatus):
     dealer = models.ForeignKey(Dealers, on_delete=models.SET_NULL, verbose_name='Buyer', null=True)
     price = MoneyField(decimal_places=2, default_currency='USD', max_digits=10)
     car_count = models.PositiveIntegerField(default=1)
+    total_cost = MoneyField(max_digits=10, decimal_places=2, default_currency='USD', verbose_name='Total cost', default=0)
 
     def __str__(self):
         return f'{self.car} : from {self.supplier} to {self.dealer}'

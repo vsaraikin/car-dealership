@@ -50,7 +50,9 @@ INSTALLED_APPS = [
     'drf_yasg',
     'debug_toolbar',
     'django_filters',
-    'djmoney'
+    'djmoney',
+    'django_celery_results',
+    'django_celery_beat'
 ]
 
 REST_FRAMEWORK = {
@@ -85,10 +87,7 @@ SIMPLE_JWT = {
     'ISSUER': None,
     'JWK_URL': None,
     'LEEWAY': 0,
-
-    # 'AUTH_HEADER_TYPES': ('Bearer',),
 }
-
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -102,11 +101,9 @@ MIDDLEWARE = [
     'debug_toolbar_force.middleware.ForceDebugToolbarMiddleware',
 ]
 
-
 INTERNAL_IPS = [
     "127.0.0.1",
 ]
-
 
 ROOT_URLCONF = 'car_dealership.urls'
 
@@ -128,9 +125,20 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'car_dealership.wsgi.application'
 
+
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
+# Check if running in Docker container
+def is_docker():
+    path = '/proc/self/cgroup'
+    return (
+            os.path.exists('/.dockerenv') or
+            os.path.isfile(path) and any('docker' in line for line in open(path))
+    )
+
+
+HOST = os.environ.get("SQL_HOST") if is_docker() else "localhost"
 
 DATABASES = {
     "default": {
@@ -138,7 +146,7 @@ DATABASES = {
         "NAME": os.environ.get("SQL_DATABASE", BASE_DIR / "db.sqlite3"),
         "USER": os.environ.get("SQL_USER", "user"),
         "PASSWORD": os.environ.get("SQL_PASSWORD", "password"),
-        "HOST": os.environ.get("SQL_HOST", "localhost"),
+        "HOST": HOST,
         "PORT": os.environ.get("SQL_PORT", "5432"),
     }
 }
@@ -181,3 +189,14 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Celery settings
+CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL", "redis://redis:6379/0")
+CELERY_RESULT_BACKEND = os.environ.get("CELERY_RESULT_BACKEND", "redis://redis:6379/0")
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_IMPORTS = [
+    "car_dealership.tasks",
+]
+# CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'

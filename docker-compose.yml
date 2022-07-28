@@ -24,3 +24,27 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     depends_on:
       - db
+  redis:
+    image: redis
+    command: redis-server
+    ports:
+      - "6379:6379"
+
+  worker:
+    build: .
+    command: celery -A car_dealership worker -l INFO
+    env_file:
+      - .env
+    volumes:
+      - .:/car_dealership
+
+
+  celery-beat:
+    build: .
+    command: celery -A car_dealership beat -l info
+    env_file:
+      - .env
+    volumes:
+      - .:/car_dealership
+    depends_on:
+      - worker
