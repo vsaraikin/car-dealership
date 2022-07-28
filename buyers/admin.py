@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Buyers, BuyerHistory, BuyerOffer
+from .models import Buyers, BuyerHistory, BuyerOffer, BuyerStatistic
 
 
 class BuyersAdmin(admin.ModelAdmin):
@@ -13,3 +13,4 @@ class BuyerHistoryAdmin(admin.ModelAdmin):
 admin.site.register(Buyers, BuyersAdmin)
 admin.site.register(BuyerHistory, BuyerHistoryAdmin)
 admin.site.register(BuyerOffer)
+admin.site.register(BuyerStatistic)

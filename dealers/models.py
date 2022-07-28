@@ -72,3 +72,15 @@ class DealerPromotion(PromotionsAndDiscounts):
 
     def __str__(self):
         return f"{self.dealership} has {self.discount}% discount on {self.car} "
+
+
+class DealerStatistic(models.Model):
+    """ A model for Dealer's statistics """
+    dealer_stats = models.ForeignKey(Dealers, on_delete=models.SET_NULL, null=True)
+    cost = MoneyField(max_digits=10, decimal_places=2, null=True, default_currency='USD')
+    revenue = MoneyField(max_digits=10, decimal_places=2, null=True, default_currency='USD')
+    total_bought_car_count = models.PositiveIntegerField(default=0)
+    total_sold_car_count = models.PositiveIntegerField(default=0)
+
+    def __str__(self):
+        return f"{self.dealer_stats} - {self.revenue} - {self.cost}"

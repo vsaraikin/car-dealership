@@ -37,3 +37,12 @@ class SupplierPromotion(PromotionsAndDiscounts):
 
     def __str__(self):
         return f"{self.supplier} sells the {self.car} with {self.discount}% discount!"
+
+
+class SupplierStatistic(models.Model):
+    supplier_stat = models.ForeignKey(Suppliers, on_delete=models.CASCADE)
+    revenue = MoneyField(max_digits=9, decimal_places=2, null=True, default_currency='USD')
+    car_count = models.PositiveIntegerField(default=0)
+
+    def __str__(self):
+        return f"{self.supplier_stat} - {self.revenue} - {self.car_count}"

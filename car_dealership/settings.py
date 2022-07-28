@@ -199,4 +199,3 @@ CELERY_RESULT_SERIALIZER = 'json'
 CELERY_IMPORTS = [
     "car_dealership.tasks",
 ]
-# CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'

@@ -1,8 +1,8 @@
 from decimal import Decimal
 from celery import shared_task
-from buyers.models import Buyers, BuyerOffer, BuyerHistory
-from dealers.models import Dealers, SupplierToDealer, Dealer, DealerPromotion, DealerToBuyer
-from suppliers.models import Supplier, SupplierPromotion
+from buyers.models import Buyers, BuyerOffer, BuyerHistory, BuyerStatistic
+from dealers.models import Dealers, SupplierToDealer, Dealer, DealerPromotion, DealerToBuyer, DealerStatistic
+from suppliers.models import Supplier, SupplierPromotion, SupplierStatistic
 
 
 @shared_task
@@ -12,7 +12,8 @@ def dealer_to_buyer_task():
     """ Task for a customer buying a car from a dealer"""
     for buyer in Buyers.objects.all():
         # Check the balance for buying a car
-        max_buyer_price = Decimal(buyer.balance.amount).quantize(Decimal('1.00')) * Decimal(disc).quantize(Decimal('1.00'))
+        max_buyer_price = Decimal(buyer.balance.amount).quantize(Decimal('1.00')) * Decimal(disc).quantize(
+            Decimal('1.00'))
         # Creating an Offer to buy a car
         BuyerOffer.objects.create(
             buyer=buyer,
@@ -90,6 +91,25 @@ def dealer_to_buyer_task():
 
         offer.active_status = False
         offer.save()
+
+        # Statistics of Buyer
+        print(f"Statistics for Buyer {car_buyer.first_name} {car_buyer.last_name}")
+        buyer_stat = BuyerStatistic.objects.filter(buyer_stats=car_buyer).first()
+
+        if not buyer_stat:
+            BuyerStatistic.objects.create(buyer_stats=car_buyer, total_cost=current_price, total_count=1)
+
+        else:
+            buyer_stat.total_spent_sum.amount += current_price
+            buyer_stat.total_car_count += 1
+            buyer_stat.save()
+
+        # Statistics of Dealer
+        dealer_stat = DealerStatistic.objects.filter(dealer_stats=current_dealer).first()
+
+        dealer_stat.total_revenue_sum += current_price
+        dealer_stat.total_spent_car_count += 1
+        dealer_stat.save()
 
 
 @shared_task
@@ -185,3 +205,26 @@ def supplier_to_dealer_task():
                 SupplierToDealer.objects.create(car=current_car, supplier=current_car.name, dealer=dealer,
                                                 price=current_price, car_count=current_count,
                                                 total_cost=current_price * current_count, )
+
+                # Statistics of Supplier
+                supplier_stat = SupplierStatistic.objects.filter(supplier_stat=current_car.name).first()
+
+                if not supplier_stat:
+                    SupplierStatistic.objects.create(supplier_stat=current_car.name, revenue=current_price,
+                                                     car_count=current_count)
+                else:
+                    supplier_stat.revenue.amount += current_price
+                    supplier_stat.car_count += current_count
+                    supplier_stat.save()
+
+                # Statistics of Dealer
+                dealer_stat = DealerStatistic.objects.filter(dealer_stats=dealer).first()
+
+                if not dealer_stat:
+                    DealerStatistic.objects.create(
+                        dealer_stats=dealer, cost=current_price, revenue=0, total_bought_car_count=current_count,
+                        total_sold_car_count=0,)
+                else:
+                    dealer_stat.revenue.amount += current_price
+                    dealer_stat.total_bought_car_count += current_count
+                    dealer_stat.save()
